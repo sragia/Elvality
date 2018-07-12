@@ -1,0 +1,16 @@
+## Interface: 80000
+## Author: Exality
+## Version: 1.0.0
+## Title: Elvality
+## Notes: Exality's custom tweaks
+## RequiredDeps: ElvUI
+
+Init.lua
+Options.lua
+Colors.lua
+
+UnitFrames\HealthFormat.lua
+UnitFrames\Icons.lua
+
+Blizzard\ObjectiveFrame.lua
+Blizzard\RaidFrames.lua
