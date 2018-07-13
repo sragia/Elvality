@@ -8,6 +8,7 @@ local DB_DEFAULT = {
   useClassBG = false,
   selectionHighlightColor = {1,1,1,1},
   classColorName = false,
+  showRaidFrameManager = true,
 }
 
 
@@ -73,6 +74,34 @@ local function SkinFrame()
     end
   end
 end
+local function HideRaidManager()
+  local point, relativeTo, relativePoint, xOfs, yOfs = CompactRaidFrameManager:GetPoint()
+  CompactRaidFrameManager:ClearAllPoints()
+  CompactRaidFrameManager:SetPoint(point, relativeTo, relativePoint, xOfs-100, yOfs)
+end
+local function ShowRaidManager()
+  local point, relativeTo, relativePoint, xOfs, yOfs = CompactRaidFrameManager:GetPoint()
+  CompactRaidFrameManager:ClearAllPoints()
+  CompactRaidFrameManager:SetPoint(point, relativeTo, relativePoint, xOfs+100, yOfs)
+end
+local function ToggleRaidManager()
+  if CompactRaidFrameManager and CompactRaidFrameManager.hidden == nil then
+    -- INIT --
+    if not db.raidFrames.showRaidFrameManager then
+      HideRaidManager()
+      CompactRaidFrameManager.hidden = true
+    else
+      CompactRaidFrameManager.hidden = false
+    end
+  elseif db.raidFrames.showRaidFrameManager and CompactRaidFrameManager and CompactRaidFrameManager.hidden == true then
+    ShowRaidManager()
+    CompactRaidFrameManager.hidden = false
+  elseif not db.raidFrames.showRaidFrameManager and CompactRaidFrameManager and CompactRaidFrameManager.hidden == false then
+    HideRaidManager()
+    CompactRaidFrameManager.hidden = true
+  end
+end
+
 
 local function init()
   db = E.db.elvality
@@ -81,6 +110,8 @@ local function init()
   end
   db.raidFrames = X.AddMissingTableEntries(db.raidFrames,DB_DEFAULT)
   SkinFrame(db.raidFrames.texture)
+
+  hooksecurefunc(CompactRaidFrameManager,"Show",function() ToggleRaidManager() end)
 end
 tinsert(X.init,init)
 
@@ -139,6 +170,16 @@ local function options()
     set = function(self,value)
       db.raidFrames.classColorName = value
       SkinFrame()
+    end
+  }
+  sbO.ToggleRaidManager = {
+    type = "toggle",
+    name = L["Show Raid Manager"],
+    order = 14,
+    get = function() return db.raidFrames.showRaidFrameManager end,
+    set = function(self,value)
+      db.raidFrames.showRaidFrameManager = value
+      ToggleRaidManager()
     end
   }
 end
