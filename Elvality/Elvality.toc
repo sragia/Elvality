@@ -14,3 +14,4 @@ UnitFrames\Icons.lua
 
 Blizzard\ObjectiveFrame.lua
 Blizzard\RaidFrames.lua
+Blizzard\Chat.lua
