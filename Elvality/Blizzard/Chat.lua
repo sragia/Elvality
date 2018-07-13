@@ -13,11 +13,13 @@ local function MoveChatTabs()
 
   -- MOVE ChatFrameX up --
   for i=1,NUM_CHAT_WINDOWS do
-    local chat = _G["ChatFrame"..i]
-    if chat then
-      local p,rt,rp,x,y = chat:GetPoint()
-      chat:ClearAllPoints()
-      chat:SetPoint(p,rt,rp,x,frame:GetHeight())
+    if i ~= 2 then
+      local chat = _G["ChatFrame"..i]
+      if chat then
+        local p,rt,rp,x,y = chat:GetPoint()
+        chat:ClearAllPoints()
+        chat:SetPoint(p,rt,rp,x,frame:GetHeight())
+      end
     end
   end
 end

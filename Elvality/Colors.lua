@@ -78,14 +78,21 @@ tinsert(X.init,init)
 local function options()
   local o = E.Options.args.elvality.args.colors.args
   local i = 2
-  o.description = {
+  o.classColors = {
+    type = "group",
+    name = L["Class"],
+    order = 1,
+    args = {}
+  }
+  local classOptions = o.classColors.args
+  classOptions.description = {
     type = "description",
     name = L["Change Class Colors"],
     order = 1,
     width = 'full'
   }
   for class,colors in pairs(db.UFColors) do
-    o[class] = {
+    classOptions[class] = {
       type = "color",
       name = class,
       order = i,
@@ -95,8 +102,15 @@ local function options()
     }
     i = i + 1
   end
+  o.powerColors = {
+    type = "group",
+    name = L["Power"],
+    order = 2,
+    args = {}
+  }
+  local powerOptions = o.powerColors.args
   -- Powers --
-  o.powerDesc = {
+  powerOptions.powerDesc = {
     type = "description",
     name = L["Power Colors"],
     order = i,
@@ -104,7 +118,7 @@ local function options()
   }
   i = i + 1
   for power,colors in pairs(db.UFPowerColors) do
-    o["powers"..power] = {
+    powerOptions["powers"..power] = {
       type = "color",
       name = powerNames[power],
       order = i,

@@ -17,12 +17,14 @@ local function coreOptions()
         type = "group",
         order = 1,
         name = L["Blizzard"],
+        childGroups = "tab",
         args = {}
       },
       colors = {
         type = "group",
         order = 30,
         name = L["Colors"],
+        childGroups = "tab",
         args = {}
       },
     },
