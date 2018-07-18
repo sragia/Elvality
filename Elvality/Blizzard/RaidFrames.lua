@@ -12,6 +12,8 @@ local DB_DEFAULT = {
   myHealPredictionColor = {1,1,1,1},
   otherHealPredictionColor = {1,1,1,1},
   selectionHighlightColor = {1,1,1,1},
+  nameFontSize = 13,
+  nameFontFlag = "",
   powerBarHeight = 9,
   useClassBG = false,
   classColorName = false,
@@ -55,7 +57,7 @@ local function SkinFrame(frame)
   local tex = LSM:Fetch('statusbar',db.raidFrames.texture)
   local absorbTex = LSM:Fetch('statusbar',db.raidFrames.absorbTexture)
   if frame and frame.unitExists then
-    -- modify frame functions -- 
+    -- modify frame functions --
     if not frame.modified then
       frame.modified = true
       for _,modify in ipairs(modifiedFunctions) do
@@ -65,7 +67,7 @@ local function SkinFrame(frame)
         end
       end
     end
-     -- texture -- 
+     -- texture --
     frame.healthBar.tex = tex
     frame.healthBar:SetStatusBarTexture(tex)
     frame.healthBar.background.tex = tex
@@ -89,7 +91,7 @@ local function SkinFrame(frame)
       frame.healthBar.background:SetVertexColor(0.1,0.1,0.1)
       frame.healthBar:SetStatusBarColor(colors[1],colors[2],colors[3])
     end
-    -- power Color -- 
+    -- power Color --
     local power = UnitPowerType(frame.unit)
     local powColors = db.UFPowerColors[power]
     if powColors then
@@ -111,6 +113,9 @@ local function SkinFrame(frame)
     else
       frame.name:SetTextColor(1,1,1)
     end
+    -- text size
+    local font = frame.name:GetFont()
+    frame.name:SetFont(font,db.raidFrames.nameFontSize,db.raidFrames.nameFontFlag)
     -- Power Bar Height --
     local point, relativeTo, relativePoint, xOfs, yOfs = frame.healthBar:GetPoint(2)
     frame.healthBar:SetPoint(point, relativeTo, relativePoint, xOfs, db.raidFrames.powerBarHeight)
@@ -241,7 +246,7 @@ end
 
 local function init()
   db = E.db.elvality
-  if not db.raidFrames then 
+  if not db.raidFrames then
     db.raidFrames = {}
   end
   db.raidFrames = X.AddMissingTableEntries(db.raidFrames,DB_DEFAULT)
@@ -282,9 +287,9 @@ local function options()
     name = L["Health Bar Texture"],
     values = values,
     get = function() return db.raidFrames.texture end,
-    set = function(self,value) 
-      db.raidFrames.texture = value 
-      SkinRaidFrames() 
+    set = function(self,value)
+      db.raidFrames.texture = value
+      SkinRaidFrames()
     end
   }
   raidFrames.absorbTexture = {
@@ -293,10 +298,39 @@ local function options()
     order = 2,
     values = values,
     get = function() return db.raidFrames.absorbTexture end,
-    set = function(self,value) 
-      db.raidFrames.absorbTexture = value 
-      SkinRaidFrames() 
+    set = function(self,value)
+      db.raidFrames.absorbTexture = value
+      SkinRaidFrames()
     end
+  }
+  raidFrames.nameFontFlag = {
+    type = "select",
+    name = L["Player Name Flag"],
+    order = 2.01,
+    values = {
+      [""] = "None",
+      ["OUTLINE"] = "Outline",
+      ["THICKOUTLINE"] = "Thick Outline",
+      ["MONOCHROME"] = "Monochrome",
+    },
+    get = function() return db.raidFrames.nameFontFlag end,
+    set = function(self,value)
+      db.raidFrames.nameFontFlag = value
+      SkinRaidFrames()
+    end
+  }
+  raidFrames.nameFontSize = {
+    type = "range",
+    name = L["Player Name Size"],
+    order = 2.02,
+    min = 1,
+    max = 40,
+    step = 1,
+    get = function() return db.raidFrames.nameFontSize end,
+    set = function(self,value)
+      db.raidFrames.nameFontSize = value
+      SkinRaidFrames()
+    end,
   }
   raidFrames.powerBarHeight = {
     type = "range",
@@ -306,7 +340,7 @@ local function options()
     max = 20,
     step = 1,
     get = function() return db.raidFrames.powerBarHeight end,
-    set = function(self,value) 
+    set = function(self,value)
       db.raidFrames.powerBarHeight = value
       SkinRaidFrames()
     end,
