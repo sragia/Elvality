@@ -8,6 +8,7 @@
 Init.lua
 Options.lua
 Colors.lua
+ElvuiSkin.lua
 
 UnitFrames\HealthFormat.lua
 UnitFrames\Icons.lua

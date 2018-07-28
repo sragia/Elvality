@@ -12,6 +12,7 @@ local DB_DEFAULT = {
   myHealPredictionColor = {1,1,1,1},
   otherHealPredictionColor = {1,1,1,1},
   selectionHighlightColor = {1,1,1,1},
+  nameFontFamily = "",
   nameFontSize = 13,
   nameFontFlag = "",
   powerBarHeight = 9,
@@ -55,6 +56,10 @@ end
 
 local function SkinFrame(frame)
   local tex = LSM:Fetch('statusbar',db.raidFrames.texture)
+  local font
+  if db.raidFrames.nameFontFamily ~= "" then
+    local font = LSM:Fetch('font',db.raidFrames.nameFontFamily)
+  end
   local absorbTex = LSM:Fetch('statusbar',db.raidFrames.absorbTexture)
   if frame and frame.unitExists then
     -- modify frame functions --
@@ -114,7 +119,9 @@ local function SkinFrame(frame)
       frame.name:SetTextColor(1,1,1)
     end
     -- text size
-    local font = frame.name:GetFont()
+    if not font then
+      font = frame.name:GetFont()
+    end
     frame.name:SetFont(font,db.raidFrames.nameFontSize,db.raidFrames.nameFontFlag)
     -- Power Bar Height --
     local point, relativeTo, relativePoint, xOfs, yOfs = frame.healthBar:GetPoint(2)
@@ -123,7 +130,23 @@ local function SkinFrame(frame)
 end
 
 local function SkinRaidFrames()
+  if InCombatLockdown() then return end -- Hmm
   if not X.initialized then return end
+  if _G["CompactRaidFrameContainer"] then
+    local f = _G["CompactRaidFrameContainer"]
+    if not f.__xOffset then
+      -- refresh
+      local _,_,_,xoff,yoff = f:GetPoint()
+      f.__xOffset = xoff
+      f.__yOffset = yoff
+    end
+    local point,relativeTo,relativePoint = f:GetPoint()
+    f:ClearAllPoints()
+    f:SetPoint(point,relativeTo,
+      relativePoint,f.__xOffset + db.raidFrames.framePosition.xCustomOffset,
+      f.__yOffset+db.raidFrames.framePosition.yCustomOffset)
+
+  end
   for i=1,40 do
     local frame = _G["CompactRaidFrame" .. i]
     SkinFrame(frame)
@@ -138,7 +161,7 @@ local function SkinRaidFrames()
       SkinFrame(frame)
     end
   end
-  if not db.raidFrames.showGroupLabel then
+  if false and not db.raidFrames.showGroupLabel then
     -- Hide
     local partyFrame =  _G["CompactPartyFrame"]
     if partyFrame and partyFrame:IsShown() then
@@ -250,14 +273,28 @@ local function init()
     db.raidFrames = {}
   end
   db.raidFrames = X.AddMissingTableEntries(db.raidFrames,DB_DEFAULT)
+  if not db.raidFrames.framePosition then
+    db.raidFrames.framePosition = {
+      xCustomOffset = 0,
+      yCustomOffset = 0,
+    }
+  end
   SkinRaidFrames(db.raidFrames.texture)
 
   hooksecurefunc(CompactRaidFrameManager,"Show",function() ToggleRaidManager() end)
+
+  _G["CompactRaidFrameManagerContainerResizeFrame"].mover:HookScript("OnMouseUp",function(self)
+    if _G["CompactRaidFrameContainer"] then
+      _G["CompactRaidFrameContainer"].__xOffset = nil
+      _G["CompactRaidFrameContainer"].__yOffset = nil
+    end
+    end)
 end
 tinsert(X.init,init)
 
 local f = CreateFrame("Frame")
 f:RegisterEvent("GROUP_ROSTER_UPDATE")
+f:RegisterEvent("PLAYER_REGEN_ENABLED")
 f:SetScript("OnEvent",function() SkinRaidFrames() end)
 local function checkframe(f)
   if f and f:GetName():find("CompactRaidFrame") then
@@ -269,11 +306,18 @@ hooksecurefunc("CompactUnitFrame_UpdateHealthColor",checkframe)
 
 local function options()
   local statusBarTextures = LSM:List("statusbar")
+  local fontFamilies = LSM:List("font")
   local sbO = E.Options.args.elvality.args.blizzard.args
   local values = {}
+  local fontValues = {}
   for _,texture in ipairs(statusBarTextures) do
     values[texture] = texture
   end
+  for _,font in ipairs(fontFamilies) do
+    fontValues[font] = font
+
+  end
+  fontValues[""] = "Default"
   sbO.raidFrames = {
     type = "group",
     name = L["Raid Frames"],
@@ -331,6 +375,17 @@ local function options()
       db.raidFrames.nameFontSize = value
       SkinRaidFrames()
     end,
+  }
+  raidFrames.nameFontFamily = {
+    type = "select",
+    order = 1,
+    name = L["Name Font"],
+    values = fontValues,
+    get = function() return db.raidFrames.nameFontFamily end,
+    set = function(self,value)
+      db.raidFrames.nameFontFamily = value
+      SkinRaidFrames()
+    end
   }
   raidFrames.powerBarHeight = {
     type = "range",
@@ -416,6 +471,33 @@ local function options()
       db.raidFrames.showGroupLabel = value
       SkinRaidFrames()
     end
+  }
+
+  raidFrames.XOffset = {
+    type = "range",
+    name = L["X Offset"],
+    order = 20,
+    min = -100,
+    max = 100,
+    step = 1,
+    get = function() return db.raidFrames.framePosition.xCustomOffset end,
+    set = function(self,value)
+      db.raidFrames.framePosition.xCustomOffset = value
+      SkinRaidFrames()
+    end,
+  }
+  raidFrames.YOffset = {
+    type = "range",
+    name = L["Y Offset"],
+    order = 21,
+    min = -100,
+    max = 100,
+    step = 1,
+    get = function() return db.raidFrames.framePosition.yCustomOffset end,
+    set = function(self,value)
+      db.raidFrames.framePosition.yCustomOffset = value
+      SkinRaidFrames()
+    end,
   }
 end
 tinsert(X.configs,options)

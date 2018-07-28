@@ -43,7 +43,7 @@ X.init = {}
 function X:Init()
   X.initialized = true
   -- DB
-  if not E.db.elvality then 
+  if not E.db.elvality then
     E.db.elvality = {}
   end
 

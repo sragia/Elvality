@@ -8,14 +8,16 @@ local function coreOptions()
     desc = L["Plugin by Exality. Contains various minor tweaks"],
     order = 10,
     args = {
-      test = {
-        type = "description",
+      exalitySkins = {
+        type = "group",
         order = 1,
-        name = L["Testing"],
+        name = L["Exality Skins"],
+        childGroups = "tab",
+        args = {}
       },
       blizzard = {
         type = "group",
-        order = 1,
+        order = 2,
         name = L["Blizzard"],
         childGroups = "tab",
         args = {}
