@@ -50,7 +50,7 @@ local function CreateAssistantIcon()
 end
 
 local function init()
-  CreateLeaderIcon()
-  CreateAssistantIcon()
+  -- CreateLeaderIcon()
+  -- CreateAssistantIcon()
 end
 table.insert( X.init, init )
